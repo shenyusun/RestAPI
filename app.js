@@ -27,57 +27,12 @@ var port = process.env.PORT || 3000; // If PORT is not there, then give PORT 300
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json());
 
-// Better way to create bunch of routes is to use --- a router.
-// Create a router called bookRouter, I can use it to define all my routes
-var bookRouter = express.Router();  
+// Code Cleanup
+bookRouter = require('./Routes/bookRoutes')(Book);
 
-// This is my Books route, and it is going to send back json.
-// I need somehting called body-parser -> A middle ware that allows 'express' to read the body,
-// and pass it to JSON so express could understand it. "npm install body-parser --save"
-
-bookRouter.route('/Books')
-	.post(function(req, res){
-		var book = new Book(req.body);
-
-		// I am going to send status '201' which means created, and then send actual book ID back
-		book.save();
-		res.status(201).send(book);
-	})
-	.get(function(req,res){
-		var query = {};    // Create a empty query
-
-		// If query is not empty, then get genre. This make sure that we don't take
-		// This is a cleaner way to make sure that I am not just taking random user input
-		// and sending that on through.
-		if (req.query.genre)
-		{
-			query.genre = req.query.genre;
-		}
-		else if (req.query.title)
-		{
-			query.title = req.query.title;
-		}
-
-		Book.find(query, function(err, books){
-			if(err)
-				res.status(500).send(err);
-			else
-				res.json(books);
-		});
-	});
-
-// Get the single item with ID
-bookRouter.route('/Books/:bookId')
-	.get(function(req,res){
-		Book.findById(req.params.bookId, function(err, book){
-			if(err)
-				res.status(500).send(err);
-			else
-				res.json(book);
-		});
-	});
-
-app.use('/api', bookRouter);	// This take care of loading all of the roots up into app.use
+// This take care of loading all of the roots up into app.use
+app.use('/api/books', bookRouter);
+//app.use('/api/authors', authorRouter);	
 
 /*
 	Setup handle for root
