@@ -1,7 +1,8 @@
 // Create reference to express
 // mongoose is to convert mongo db to json format.
 var express = require('express'),
-	mongoose = require('mongoose');
+	mongoose = require('mongoose'),
+	bodyParser = require('body-parser');
 
 // Open mongodb connection
 var db = mongoose.connect('mongodb://localhost/bookAPI');
@@ -16,12 +17,32 @@ var app = express();
 // Setup a port
 var port = process.env.PORT || 3000; // If PORT is not there, then give PORT 3000
 
+
+/* I need to let my app know that I need to use the bodyparser
+	bodyParser.json -> to tell what type of body I am going to use.
+	bodyParser is going to check if it has any JSON objects in it, and if it does
+	then it's going to take that JSON object and add it to req.body, and I can use 
+	req.body to create new book
+*/	
+app.use(bodyParser.urlencoded({extended:true}));
+app.use(bodyParser.json());
+
 // Better way to create bunch of routes is to use --- a router.
 // Create a router called bookRouter, I can use it to define all my routes
 var bookRouter = express.Router();  
 
 // This is my Books route, and it is going to send back json.
+// I need somehting called body-parser -> A middle ware that allows 'express' to read the body,
+// and pass it to JSON so express could understand it. "npm install body-parser --save"
+
 bookRouter.route('/Books')
+	.post(function(req, res){
+		var book = new Book(req.body);
+
+		// I am going to send status '201' which means created, and then send actual book ID back
+		book.save();
+		res.status(201).send(book);
+	})
 	.get(function(req,res){
 		var query = {};    // Create a empty query
 
