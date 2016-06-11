@@ -40,8 +40,12 @@ var routes = function(Book){
 
 	// Get the single item with ID
 	bookRouter.route('/:bookId')					  // In order to update item out of 
-		.get(function(req,res){					     // MongoDB database, I need to get the item
-			res.json(req.book);					    // MongoDB database, I need to get the item
+		.get(function(req,res){	
+			var returnBook = req.book.toJSON();
+			returnBook.links = {};
+			var newLink = 'http://' + req.headers.host + '/api/books/?genre=' + returnBook.genre;
+			returnBook.links.FilterByThisGenre = newLink.replace(' ', '%20');
+			res.json(returnBook);					    // MongoDB database, I need to get the item
 		})										   // that I'm editing, so I use book.findById
 		.put(function(req,res){				      // and then req.params.bookId. If I have issue
 			req.book.title = req.body.title;     // then I'll send back an error.
