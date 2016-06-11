@@ -5,7 +5,12 @@ var express = require('express'),
 	bodyParser = require('body-parser');
 
 // Open mongodb connection
-var db = mongoose.connect('mongodb://localhost/bookAPI');
+var db;
+
+if(process.env.ENV == 'Test')
+	db = mongoose.connect('mongodb://localhost/bookAPI_test');
+else
+	db = mongoose.connect('mongodb://localhost/bookAPI');
 
 // Mongoose knows how to translate the data that it gets out of MongoDB is uses a modles.
 // Create a model called bookModel
@@ -51,3 +56,4 @@ app.listen(port, function(){
 	console.log('Gulp is running this app on PORT: ' + port);
 });
 
+module.exports = app;

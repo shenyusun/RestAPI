@@ -4,6 +4,7 @@ var routes = function(Book){
 	// Better way to create bunch of routes is to use --- a router.
 	// Create a router called bookRouter, I can use it to define all my routes
 	var bookRouter = express.Router();  
+	var bookController = require('../Controllers/bookController')(Book)
 
 	// This is my Books route, and it is going to send back json.
 	// I need somehting called body-parser -> A middle ware that allows 'express' to read the body,
@@ -11,35 +12,8 @@ var routes = function(Book){
 
 	bookRouter.route('/')
 	// ==== Start: Post a new item back to my API ====
-		.post(function(req, res){
-			var book = new Book(req.body);
-
-			// I am going to send status '201' which means created, and then send actual book ID back
-			book.save();
-			res.status(201).send(book);  // ==== End: Post a new item back to my API ====
-		})  // ==== Start: Get a list of items ====
-		.get(function(req,res){
-			var query = {};    // Create a empty query
-
-			// If query is not empty, then get genre. This make sure that we don't take
-			// This is a cleaner way to make sure that I am not just taking random user input
-			// and sending that on through.
-			if (req.query.genre)
-			{
-				query.genre = req.query.genre;
-			}
-			else if (req.query.title)
-			{
-				query.title = req.query.title;
-			}
-
-			Book.find(query, function(err, books){
-				if(err)
-					res.status(500).send(err);
-				else
-					res.json(books);
-			});
-		});
+		.post(bookController.post)  // ==== Start: Get a list of items ====
+		.get(bookController.get);
 	// ==== End: Get a list of items ====
 
 	/* Create a middleware
